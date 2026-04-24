@@ -1,0 +1,54 @@
+{
+  "task_id": "add-scene",
+  "version": "1.0.0",
+  "description": "Add a new scene to the animation timeline at a specified position.",
+  "inputs": {
+    "after_scene_id": "string — insert the new scene after this scene ID",
+    "title": "string — proposed scene title",
+    "narrative_role": "string — how this scene fits the storyboard intent",
+    "duration_sec": "number — proposed duration in seconds",
+    "assets": "array of asset IDs this scene will use"
+  },
+  "token_budget": 3000,
+  "expected_output": {
+    "schema": "scene-entry",
+    "description": "New scene entry ready to be inserted in map/scenes.json, pending human approval"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "action": "load",
+      "target": "intent/storyboard.md",
+      "priority": "high",
+      "purpose": "Validate that the new scene fits the emotional arc"
+    },
+    {
+      "step": 2,
+      "action": "load",
+      "target": "map/scenes.json",
+      "priority": "high",
+      "purpose": "Get current total_duration_sec and recalculate start/end times for all affected scenes"
+    },
+    {
+      "step": 3,
+      "action": "load",
+      "target": "map/assets.json",
+      "priority": "medium",
+      "purpose": "Validate that referenced asset IDs exist"
+    },
+    {
+      "step": 4,
+      "action": "ask",
+      "condition": "if current total_duration_sec + duration_sec > 30.5",
+      "message": "Adding this scene would exceed the 30-second runtime. Which existing scene should be shortened or removed?",
+      "purpose": "Respect the runtime constraint before proceeding"
+    },
+    {
+      "step": 5,
+      "action": "emit",
+      "output_schema": "scene-entry",
+      "note": "Output is a draft. Human must approve before map/scenes.json is updated.",
+      "purpose": "Produce the new scene entry with recalculated timeline positions"
+    }
+  ]
+}
