@@ -1,0 +1,53 @@
+{
+  "task_id": "add-slide",
+  "version": "1.0.0",
+  "description": "Add a new slide to the deck at a specified position in the narrative arc.",
+  "inputs": {
+    "after_slide_id": "string — insert the new slide after this slide ID",
+    "title": "string — proposed slide title",
+    "narrative_role": "string — how this slide fits the story (act + purpose)",
+    "data_sources": "array of dataset IDs this slide will use (may be empty)"
+  },
+  "token_budget": 3000,
+  "expected_output": {
+    "schema": "slide-entry",
+    "description": "New slide entry ready to be appended to map/slides.json, pending human approval"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "action": "load",
+      "target": "intent/narrative.md",
+      "priority": "high",
+      "purpose": "Understand the narrative arc to validate where the new slide fits"
+    },
+    {
+      "step": 2,
+      "action": "load",
+      "target": "map/slides.json",
+      "priority": "high",
+      "purpose": "Check current slide count (max 20) and assign the next available slide ID"
+    },
+    {
+      "step": 3,
+      "action": "load",
+      "target": "map/datasets.json",
+      "priority": "medium",
+      "purpose": "Validate that referenced data_source IDs exist"
+    },
+    {
+      "step": 4,
+      "action": "ask",
+      "condition": "if slide count is already 20",
+      "message": "The deck is at the 20-slide limit. Which existing slide should be removed or merged to make room?",
+      "purpose": "Respect the audience constraint before proceeding"
+    },
+    {
+      "step": 5,
+      "action": "emit",
+      "output_schema": "slide-entry",
+      "note": "Output is a draft. Human must approve before map/slides.json is updated.",
+      "purpose": "Produce the new slide entry"
+    }
+  ]
+}

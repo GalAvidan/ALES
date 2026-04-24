@@ -1,0 +1,48 @@
+{
+  "task_id": "refresh-chart",
+  "version": "1.0.0",
+  "description": "Pull updated data for a specific chart slide and regenerate the chart spec.",
+  "inputs": {
+    "slide_id": "string — the ID of the slide whose chart should be refreshed (e.g. 'slide-03')"
+  },
+  "token_budget": 4000,
+  "expected_output": {
+    "schema": "chart-spec",
+    "description": "Updated chart specification with refreshed data values and applied brand styles"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "action": "load",
+      "target": "map/slides.json",
+      "priority": "high",
+      "purpose": "Resolve which dataset(s) the target slide depends on"
+    },
+    {
+      "step": 2,
+      "action": "load",
+      "target": "map/datasets.json",
+      "priority": "high",
+      "purpose": "Get the file path and last_updated timestamp for each dependent dataset"
+    },
+    {
+      "step": 3,
+      "action": "follow_flow",
+      "flow": "data-to-chart",
+      "purpose": "Execute the standard data-to-chart derivation flow"
+    },
+    {
+      "step": 4,
+      "action": "mark_stale",
+      "target": "map/slides.json",
+      "condition": "if dataset last_updated is newer than slides.json generated_at",
+      "purpose": "Flag the map for batch refresh if other slides may be affected"
+    },
+    {
+      "step": 5,
+      "action": "emit",
+      "output_schema": "chart-spec",
+      "purpose": "Return the updated chart specification"
+    }
+  ]
+}

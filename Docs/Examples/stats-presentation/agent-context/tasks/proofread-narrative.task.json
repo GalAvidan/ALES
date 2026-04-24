@@ -1,0 +1,51 @@
+{
+  "task_id": "proofread-narrative",
+  "version": "1.0.0",
+  "description": "Check all slide titles and body text for consistency with the narrative arc and audience rules.",
+  "inputs": {},
+  "token_budget": 6000,
+  "expected_output": {
+    "schema": "proofread-report",
+    "description": "List of issues found: slide ID, issue type, suggested fix"
+  },
+  "steps": [
+    {
+      "step": 1,
+      "action": "load",
+      "target": "intent/narrative.md",
+      "priority": "high",
+      "purpose": "Load the intended story arc to check slide order and roles"
+    },
+    {
+      "step": 2,
+      "action": "load",
+      "target": "intent/audience.md",
+      "priority": "high",
+      "purpose": "Load audience rules (no jargon, positive framing, always-pair-with-delta)"
+    },
+    {
+      "step": 3,
+      "action": "load",
+      "target": "map/slides.json",
+      "priority": "high",
+      "purpose": "Get all slide titles and narrative_role values"
+    },
+    {
+      "step": 4,
+      "action": "inspect_code",
+      "purpose": "Check each slide title against audience rules and narrative_role against the arc",
+      "checks": [
+        "No statistical jargon in titles or body text",
+        "Absolute numbers paired with delta where applicable",
+        "Positive framing rule",
+        "narrative_role matches the act declared in narrative.md"
+      ]
+    },
+    {
+      "step": 5,
+      "action": "emit",
+      "output_schema": "proofread-report",
+      "purpose": "Return list of issues with slide ID, rule violated, and suggested fix"
+    }
+  ]
+}

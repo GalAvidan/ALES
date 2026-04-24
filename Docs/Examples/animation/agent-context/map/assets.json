@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "generated_at": "2026-04-24T10:00:00Z",
+    "ttl_days": 7,
+    "stale": false,
+    "stale_reason": null,
+    "derived_from": ["src/assets/"],
+    "fingerprint": "sha256:placeholder"
+  },
+  "assets": [
+    {
+      "id": "bg-chaos-loop",
+      "type": "video",
+      "path": "src/assets/video/bg-chaos-loop.mp4",
+      "description": "Background loop showing problem scenario — chaotic desk/environment",
+      "resolution": "1920x1080",
+      "fps": 60,
+      "used_in_scenes": ["scene-01"]
+    },
+    {
+      "id": "particle-origin",
+      "type": "animation",
+      "path": "src/assets/anim/particle-origin.json",
+      "description": "Single light particle growing from dark background (Lottie/AE)",
+      "used_in_scenes": ["scene-02"]
+    },
+    {
+      "id": "product-3d-model",
+      "type": "3d-model",
+      "path": "src/assets/models/product-v3.glb",
+      "description": "Product 3D model for reveal and demo scenes — v3 is approved final geometry",
+      "used_in_scenes": ["scene-03", "scene-04"]
+    },
+    {
+      "id": "product-in-use-anim",
+      "type": "animation",
+      "path": "src/assets/anim/product-in-use.json",
+      "description": "Product interaction animation — one action leading to one outcome",
+      "used_in_scenes": ["scene-04"]
+    },
+    {
+      "id": "logo-lockup",
+      "type": "vector",
+      "path": "src/assets/brand/logo-lockup-with-tagline.svg",
+      "description": "Brand logo with tagline, white background variant",
+      "used_in_scenes": ["scene-05"]
+    },
+    {
+      "id": "sfx-noise",
+      "type": "audio",
+      "path": "src/assets/audio/sfx-noise-loop.wav",
+      "description": "Background noise/chaos sound for problem scene",
+      "used_in_scenes": ["scene-01"]
+    },
+    {
+      "id": "sfx-silence",
+      "type": "audio",
+      "path": "src/assets/audio/sfx-silence-fade.wav",
+      "description": "Fade-to-silence for transition scene",
+      "used_in_scenes": ["scene-02"]
+    },
+    {
+      "id": "sfx-reveal-sting",
+      "type": "audio",
+      "path": "src/assets/audio/sfx-reveal-sting.wav",
+      "description": "Short musical sting for product reveal moment",
+      "used_in_scenes": ["scene-03"]
+    },
+    {
+      "id": "sfx-upbeat-melody",
+      "type": "audio",
+      "path": "src/assets/audio/sfx-upbeat-full.wav",
+      "description": "Full upbeat melody for benefit demo and logo hold",
+      "used_in_scenes": ["scene-04", "scene-05"]
+    },
+    {
+      "id": "sfx-outro",
+      "type": "audio",
+      "path": "src/assets/audio/sfx-outro-tail.wav",
+      "description": "Outro tail — last 2 seconds fade",
+      "used_in_scenes": ["scene-05"]
+    }
+  ]
+}

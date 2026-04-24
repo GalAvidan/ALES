@@ -1,0 +1,84 @@
+{
+  "_meta": {
+    "generated_at": "2026-04-24T10:00:00Z",
+    "ttl_days": 1,
+    "stale": false,
+    "stale_reason": null,
+    "derived_from": ["data/datasets/"],
+    "fingerprint": "sha256:placeholder"
+  },
+  "datasets": [
+    {
+      "id": "revenue-quarterly",
+      "path": "data/datasets/revenue-quarterly.csv",
+      "description": "Total revenue by quarter, actuals vs plan",
+      "columns": ["quarter", "revenue_eur", "plan_eur"],
+      "last_updated": "2026-04-20T08:00:00Z",
+      "used_by_slides": ["slide-03", "slide-08", "slide-11", "slide-18"]
+    },
+    {
+      "id": "market-share",
+      "path": "data/datasets/market-share.csv",
+      "description": "Company market share percentage by quarter",
+      "columns": ["quarter", "share_pct"],
+      "last_updated": "2026-04-18T08:00:00Z",
+      "used_by_slides": ["slide-04"]
+    },
+    {
+      "id": "pricing-uplift",
+      "path": "data/datasets/pricing-uplift.csv",
+      "description": "Average selling price per SKU category by quarter",
+      "columns": ["quarter", "category", "avg_price_eur"],
+      "last_updated": "2026-04-20T08:00:00Z",
+      "used_by_slides": ["slide-06"]
+    },
+    {
+      "id": "b2b-cohort",
+      "path": "data/datasets/b2b-cohort.csv",
+      "description": "New B2B customer cohort count and revenue contribution by quarter",
+      "columns": ["quarter", "new_customers", "cohort_revenue_eur"],
+      "last_updated": "2026-04-20T08:00:00Z",
+      "used_by_slides": ["slide-07", "slide-08", "slide-19"]
+    },
+    {
+      "id": "cost-to-serve",
+      "path": "data/datasets/cost-to-serve.csv",
+      "description": "Cost-to-serve per unit and resulting EBITDA margin by quarter",
+      "columns": ["quarter", "cost_per_unit_eur", "ebitda_margin_pct"],
+      "last_updated": "2026-04-20T08:00:00Z",
+      "used_by_slides": ["slide-10"]
+    },
+    {
+      "id": "ebitda-quarterly",
+      "path": "data/datasets/ebitda-quarterly.csv",
+      "description": "EBITDA actuals by quarter",
+      "columns": ["quarter", "ebitda_eur"],
+      "last_updated": "2026-04-20T08:00:00Z",
+      "used_by_slides": ["slide-12"]
+    },
+    {
+      "id": "plan",
+      "path": "data/datasets/plan.csv",
+      "description": "Annual plan figures for revenue and EBITDA by quarter",
+      "columns": ["quarter", "plan_revenue_eur", "plan_ebitda_eur"],
+      "last_updated": "2026-01-15T08:00:00Z",
+      "used_by_slides": ["slide-11", "slide-12"]
+    },
+    {
+      "id": "guidance-q4",
+      "path": "data/datasets/guidance-q4.csv",
+      "description": "Q4 guidance range: low, base, high scenarios",
+      "columns": ["scenario", "revenue_eur"],
+      "last_updated": "2026-04-22T08:00:00Z",
+      "used_by_slides": ["slide-13"]
+    },
+    {
+      "id": "macro-indicators",
+      "path": "data/datasets/macro-indicators.csv",
+      "description": "Macro headwind indicators referenced in Q1 narrative",
+      "columns": ["indicator", "q1_value", "source"],
+      "last_updated": "2026-04-10T08:00:00Z",
+      "used_by_slides": ["slide-02"]
+    }
+  ]
+}

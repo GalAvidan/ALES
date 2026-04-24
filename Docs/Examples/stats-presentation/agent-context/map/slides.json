@@ -1,0 +1,161 @@
+{
+  "_meta": {
+    "generated_at": "2026-04-24T10:00:00Z",
+    "ttl_days": 1,
+    "stale": false,
+    "stale_reason": null,
+    "derived_from": ["data/slides/slides-manifest.csv"],
+    "fingerprint": "sha256:placeholder"
+  },
+  "slides": [
+    {
+      "id": "slide-01",
+      "title": "Q3 2026 Board Presentation",
+      "type": "title",
+      "data_sources": [],
+      "narrative_role": "Title and date"
+    },
+    {
+      "id": "slide-02",
+      "title": "Q1 Headwinds",
+      "type": "content",
+      "data_sources": ["datasets/macro-indicators.csv"],
+      "narrative_role": "Act 1 — set the scene"
+    },
+    {
+      "id": "slide-03",
+      "title": "Revenue Waterfall Q1–Q3",
+      "type": "chart",
+      "chart_type": "waterfall",
+      "data_sources": ["datasets/revenue-quarterly.csv"],
+      "narrative_role": "Act 1 — show the dip and recovery shape"
+    },
+    {
+      "id": "slide-04",
+      "title": "Market Share Held",
+      "type": "chart",
+      "chart_type": "line",
+      "data_sources": ["datasets/market-share.csv"],
+      "narrative_role": "Act 1 — confidence signal despite revenue dip"
+    },
+    {
+      "id": "slide-05",
+      "title": "Driver 1: Pricing Uplift — Overview",
+      "type": "content",
+      "data_sources": [],
+      "narrative_role": "Act 2 — introduce pricing driver"
+    },
+    {
+      "id": "slide-06",
+      "title": "Driver 1: Pricing Uplift — Data",
+      "type": "chart",
+      "chart_type": "bar",
+      "data_sources": ["datasets/pricing-uplift.csv"],
+      "narrative_role": "Act 2 — pricing evidence"
+    },
+    {
+      "id": "slide-07",
+      "title": "Driver 2: New B2B Customer Cohort",
+      "type": "chart",
+      "chart_type": "bar",
+      "data_sources": ["datasets/b2b-cohort.csv"],
+      "narrative_role": "Act 2 — new customer driver evidence"
+    },
+    {
+      "id": "slide-08",
+      "title": "Driver 2: B2B Cohort Revenue Impact",
+      "type": "chart",
+      "chart_type": "line",
+      "data_sources": ["datasets/b2b-cohort.csv", "datasets/revenue-quarterly.csv"],
+      "narrative_role": "Act 2 — link cohort growth to revenue"
+    },
+    {
+      "id": "slide-09",
+      "title": "Driver 3: Cost-to-Serve Reduction",
+      "type": "content",
+      "data_sources": [],
+      "narrative_role": "Act 2 — introduce cost driver"
+    },
+    {
+      "id": "slide-10",
+      "title": "Driver 3: Margin Improvement",
+      "type": "chart",
+      "chart_type": "bar",
+      "data_sources": ["datasets/cost-to-serve.csv"],
+      "narrative_role": "Act 2 — cost-to-serve evidence"
+    },
+    {
+      "id": "slide-11",
+      "title": "Q3 Revenue vs Plan",
+      "type": "chart",
+      "chart_type": "bar",
+      "data_sources": ["datasets/revenue-quarterly.csv", "datasets/plan.csv"],
+      "narrative_role": "Act 2 — combined effect, revenue"
+    },
+    {
+      "id": "slide-12",
+      "title": "Q3 EBITDA vs Plan",
+      "type": "chart",
+      "chart_type": "bar",
+      "data_sources": ["datasets/ebitda-quarterly.csv", "datasets/plan.csv"],
+      "narrative_role": "Act 2 — combined effect, EBITDA"
+    },
+    {
+      "id": "slide-13",
+      "title": "Q4 Revenue Guidance",
+      "type": "chart",
+      "chart_type": "range-bar",
+      "data_sources": ["datasets/guidance-q4.csv"],
+      "narrative_role": "Act 3 — forward look"
+    },
+    {
+      "id": "slide-14",
+      "title": "Key Assumptions",
+      "type": "content",
+      "data_sources": [],
+      "narrative_role": "Act 3 — assumptions behind guidance"
+    },
+    {
+      "id": "slide-15",
+      "title": "Downside Scenarios",
+      "type": "content",
+      "data_sources": [],
+      "narrative_role": "Act 3 — risk disclosure"
+    },
+    {
+      "id": "slide-16",
+      "title": "Closing",
+      "type": "content",
+      "data_sources": [],
+      "narrative_role": "Act 3 — ask and close"
+    },
+    {
+      "id": "slide-17",
+      "title": "Appendix: Methodology",
+      "type": "appendix",
+      "data_sources": [],
+      "narrative_role": "Appendix"
+    },
+    {
+      "id": "slide-18",
+      "title": "Appendix: Revenue Raw Data",
+      "type": "appendix",
+      "data_sources": ["datasets/revenue-quarterly.csv"],
+      "narrative_role": "Appendix"
+    },
+    {
+      "id": "slide-19",
+      "title": "Appendix: B2B Cohort Raw Data",
+      "type": "appendix",
+      "data_sources": ["datasets/b2b-cohort.csv"],
+      "narrative_role": "Appendix"
+    },
+    {
+      "id": "slide-20",
+      "title": "Appendix: Definitions",
+      "type": "appendix",
+      "data_sources": [],
+      "narrative_role": "Appendix"
+    }
+  ]
+}
