@@ -65,12 +65,52 @@ V3 is **not** yet a product release, hosted service, or enterprise security arch
 | V2 | V3 |
 |---|---|
 | File-level provenance (`_meta` on each derived file) | + Claim-level provenance (individual assertions in `intent/` and `skills/` carry source pointers) |
-| Single-agent, single-author assumed | Multi-agent concurrency model defined |
-| Static context priority tiers in task files | Adaptive priority selector informed by trace history |
+| Single-agent, single-author assumed | Multi-agent concurrency model defined; executor taxonomy introduced (primary agent, spawned sub-agent, tool task, verifier) |
+| Static context priority tiers in task files | Adaptive priority selector informed by trace history (memory layer) |
 | Evaluation protocol designed, not run | Evaluation results reported, analyzed |
 | Skills and tasks are repo-local | Cross-repo import interface defined |
-| Trace is a write-once audit log | Trace data feeds back into staleness scores and priority calibration |
+| Trace is a write-once audit log | `traces/` named as the **memory layer**; trace data feeds back into staleness scores and priority calibration |
 | Trusted single-author environment assumed | Multi-author review gates specified (CODEOWNERS, PR-required for `tasks/` and `skills/`) |
+| No formal framing of context as shared infrastructure | Context layers explicitly framed as shared infrastructure routed into every executor's context window |
+
+---
+
+## Context Layers as Shared Execution Infrastructure (V3)
+
+The screenshot below (from an independent GPT-5.4 analysis) captures the architectural framing that V3 formally adopts:
+
+> *Context layers are the real shared infrastructure.  
+> A knowledge layer, a rule layer, a task layer, maybe a memory layer —  
+> all routed into the current execution context, available to whatever executor is acting:  
+> primary agent, spawned sub-agent, tool task, verifier.*
+
+This framing is precisely what ALES implements. V3 makes it explicit.
+
+### The Four Context Sub-Layers
+
+| Sub-layer | ALES layer | What it holds | Who owns it |
+|---|---|---|---|
+| **Knowledge** | `intent/` + `map/` | Why the system is shaped this way; where things live | Human (`intent/`), agent-derived (`map/`) |
+| **Rule** | `skills/` | Project-specific constraints, workflows, and verification steps | Human (agent may suggest) |
+| **Task** | `tasks/` | Generic execution procedures, portable across repos | Spec-level; shared |
+| **Memory** | `traces/` | Execution history, priority calibration data, cross-run consistency signal | Agent-written; human-readable |
+
+The **memory layer** is what V3's `traces/` layer provides. It is not merely an audit log — it is the accumulated execution experience of the system, read by future agents to make better context-selection decisions. Naming it explicitly as the memory layer aligns the ALES vocabulary with how multi-agent systems literature describes persistent state.
+
+### Executor Taxonomy
+
+Every context sub-layer is **available to all executor types**, not just the primary agent. V3 defines four executor types and their relationship to the shared context:
+
+| Executor | Role | Context access |
+|---|---|---|
+| **Primary agent** | Receives the user request; drives the execution loop (RESOLVE → PLAN → LOAD → EXECUTE → EMIT) | Full read access to all four sub-layers; writes traces and `_pending/` drafts |
+| **Spawned sub-agent** | Delegated a scoped sub-task by the primary agent (e.g., "refresh this map entry", "verify this output") | Reads the same `/agent-context/` snapshot as the primary agent; may write `mark_stale` and traces; may not write `_pending/` without primary agent approval |
+| **Tool task** | A discrete, bounded action invoked as a step within the execution loop (e.g., `check_claims`, `search`, `inspect_code`) | Read-only context access scoped to the files declared by the invoking step; no trace write |
+| **Verifier** | Checks the output of the EXECUTE phase against the `expected_output_schema` declared in the task | Read-only access to the task definition and the output under review; writes a verification result into the primary agent's trace |
+
+**Key rule:** The context snapshot loaded at PLAN time is shared and immutable for the duration of one task execution. A spawned sub-agent or tool task may not load additional context files outside the declared priority tiers of the parent task without an explicit priority escalation emitted back to the primary agent.
+
+**V3 concurrency implication:** The multi-agent concurrency rules already defined in this plan apply at the executor level. A spawned sub-agent that calls `mark_stale` follows the same last-write-wins-on-stale rule as any other agent. A verifier may not clear a stale flag.
 
 ---
 
@@ -78,12 +118,12 @@ V3 is **not** yet a product release, hosted service, or enterprise security arch
 
 The layers are unchanged. The semantics are extended.
 
-| Layer | Question it answers | Owner | Freshness model | V3 extension |
-|---|---|---|---|---|
-| **`intent/`** | *Why* is the system shaped this way? | Human (agent may draft) | Manual; claim-level provenance now tracks source for individual assertions | Claim-level `_cite` pointers per assertion block |
-| **`map/`** | *Where* do things live and *what* exists? | Agent (derived from source) | Fingerprint + TTL → batch refresh; trace-informed TTL calibration | Trace-informed staleness scoring; dependency graph for cascade marking |
-| **`skills/`** | *How do you do X in this specific project?* | Human (agent may suggest) | Versioned; claim-level provenance on constraints and verification steps | Import interface for shared skills from central registry |
-| **`tasks/`** | *How does an agent execute a generic class of work?* | Spec-level; shared | Spec-versioned; portable across repos | Import interface for shared tasks; adaptive priority selector |
+| Layer | Sub-layer name | Question it answers | Owner | Freshness model | V3 extension |
+|---|---|---|---|---|---|
+| **`intent/`** + **`map/`** | Knowledge | *Why* and *what* | Human / Agent-derived | Manual + fingerprint+TTL | Claim-level `_cite` pointers; trace-informed TTL calibration |
+| **`skills/`** | Rule | *How to do X in this specific project?* | Human (agent may suggest) | Versioned; claim-level provenance | Import interface for shared skills |
+| **`tasks/`** | Task | *How does an agent execute a generic class of work?* | Spec-level; shared | Spec-versioned; portable | Import interface; adaptive priority selector |
+| **`traces/`** | Memory | *What has been done before, and what worked?* | Agent-written | Retention policy; TTL calibration | First-class read layer for adaptive selection |
 
 ---
 
@@ -412,6 +452,8 @@ V2 named the minimum POC security awareness. V3 operationalizes it.
 5. **Trace retention and privacy** — traces contain file paths, potentially sensitive data. What is the right default `trace_retention_days` and redaction policy for open-source vs. private repos?
 6. **Multi-runtime consistency** — if GitHub Copilot and Claude Code both run the same task and produce divergent traces, who arbitrates which priority calibration wins?
 7. **Second POC repo selection** — what second tech stack best demonstrates model-portability without duplicating the first repo's domain?
+8. **Sub-agent spawning protocol** — when a primary agent delegates a scoped sub-task, how does it pass the context snapshot boundary? Does the sub-agent receive the full loaded context or only the files declared for that step?
+9. **Tool task isolation** — tool tasks are declared read-only in V3. Should a tool task be able to escalate to a write (e.g., `mark_stale`) with explicit primary agent delegation, or is the boundary absolute?
 
 ---
 
