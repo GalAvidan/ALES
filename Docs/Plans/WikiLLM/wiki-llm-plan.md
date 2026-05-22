@@ -2,381 +2,256 @@
 
 ## Purpose
 
-This plan captures the Wiki LLM idea as a concrete workflow that can be compared with, implemented through, and eventually used as a case study for ALES.
+This plan describes the Wiki LLM idea as a standalone workflow pattern for building personal knowledge bases with LLMs.
 
-The goal is not to replace ALES.
+It does not discuss ALES integration (see `ales-absorption-plan.md` for that).
 
-The goal is to define a practical, usable version of Wiki LLM that ALES can govern.
+---
 
 ## Core Idea
 
-Wiki LLM is a pattern for building a living knowledge base where:
+Wiki LLM is a pattern where the LLM incrementally builds and maintains a persistent, interlinked wiki from raw sources.
 
-- raw sources are curated by a human
-- the LLM reads and integrates sources
-- the LLM maintains a persistent markdown wiki
-- useful query results are filed back into the wiki
-- contradictions, updates, and open questions are tracked over time
-- the wiki becomes richer with every source and every serious question
-
-The core distinction from RAG:
+The key distinction from RAG:
 
 > RAG retrieves and synthesizes at query time. Wiki LLM compiles knowledge into a persistent artifact that compounds over time.
 
-## Main Layers
+The human curates sources and asks questions. The LLM does all the maintenance: summarizing, cross-referencing, filing, updating, and flagging contradictions.
 
-### 1. Raw sources
+---
 
-Raw sources are immutable.
+## Architecture
 
-They are the source of truth.
+### Layer 1: Raw Sources
+
+Immutable. The human curates them. The LLM reads but never modifies.
 
 Examples:
 
-- articles
-- papers
-- transcripts
-- notes
+- articles, papers, reports
 - book chapters
-- images
-- datasets
+- transcripts (meetings, podcasts, interviews)
+- notes, journal entries
+- images, data files
 - web clippings
 
-The LLM may read these files but should not modify them.
+### Layer 2: Generated Wiki
 
-### 2. Generated wiki
+LLM-maintained markdown files. The LLM owns this layer entirely.
 
-The wiki is the LLM-maintained knowledge product.
+Page types:
 
-It contains:
+- **Source summaries** — one per ingested source
+- **Concept pages** — one per important idea or topic
+- **Entity pages** — one per person, organization, place, or thing
+- **Synthesis pages** — cross-source analyses
+- **Comparison pages** — structured side-by-side evaluations
+- **Contradiction pages** — unresolved conflicts between sources
+- **Open questions** — what the wiki cannot yet answer
 
-- source summaries
-- concept pages
-- entity pages
-- synthesis pages
-- comparison pages
-- contradiction pages
-- open questions
-- overview pages
-- index and log files
+### Layer 3: Operating Schema
 
-Humans read and browse this layer.
+A configuration document that tells the LLM:
 
-The LLM owns maintenance.
+- how the wiki is structured
+- what conventions to follow
+- what workflows to use for ingest, query, and maintenance
 
-### 3. Operating schema
+This could be a single `AGENTS.md` file, or a full `agent-context/` structure.
 
-The schema tells the LLM how to maintain the wiki.
-
-In an ALES implementation, this should be represented by:
-
-- `agent-context/intent/`
-- `agent-context/map/`
-- `agent-context/skills/`
-- `agent-context/tasks/`
-- `agent-context/traces/`
-
-In a simpler non-ALES implementation, this might be a single `AGENTS.md`, `CLAUDE.md`, or similar instruction file.
-
-## Recommended Folder Structure
-
-```text
-wiki-llm/
-├── raw/
-│   ├── sources/
-│   └── assets/
-├── wiki/
-│   ├── index.md
-│   ├── log.md
-│   ├── overview.md
-│   ├── concepts/
-│   ├── entities/
-│   ├── sources/
-│   ├── syntheses/
-│   ├── comparisons/
-│   └── contradictions.md
-└── agent-context/
-    ├── ales.manifest.json
-    ├── intent/
-    ├── map/
-    ├── skills/
-    ├── tasks/
-    └── traces/
-```
+---
 
 ## Core Operations
 
-### 1. Ingest
+### Ingest
 
-Ingest processes a new source into the wiki.
+Process a new source into the wiki.
 
-Expected flow:
+Steps:
 
-1. Read the new source.
-2. Identify key claims, entities, concepts, and evidence.
+1. Read the source.
+2. Extract key claims, entities, concepts, and evidence.
 3. Create or update a source summary page.
-4. Update relevant concept and entity pages.
-5. Detect contradictions with existing pages.
+4. Update all affected concept and entity pages.
+5. Detect contradictions with existing claims.
 6. Update `index.md`.
-7. Append an entry to `log.md`.
-8. Write a trace if using ALES.
+7. Append to `log.md`.
 
-Important rule:
+Important: ingest updates the whole affected knowledge graph, not just a single summary page. A single source may touch 10–15 wiki pages.
 
-> Ingest should update the whole affected knowledge graph, not only create a summary page.
+### Query
 
-### 2. Query
+Answer a question against the wiki.
 
-Query answers a question against the wiki.
+Steps:
 
-Expected flow:
+1. Read `index.md` to find relevant pages.
+2. Read relevant wiki pages.
+3. If needed, check raw sources for verification.
+4. Synthesize an answer with citations.
+5. Decide whether to file the answer as a new wiki page.
 
-1. Read `wiki/index.md`.
-2. Identify relevant wiki pages.
-3. Read relevant source summaries and synthesis pages.
-4. If needed, inspect raw sources for verification.
-5. Answer with citations.
-6. Decide whether the answer should be filed back into the wiki.
+Filing rule: file the answer when it represents durable, reusable knowledge (a comparison, synthesis, timeline, or unresolved question). Do not file purely conversational or low-confidence answers.
 
-Useful query outputs that should often be filed:
+### Lint
 
-- comparisons
-- synthesis pages
-- timelines
-- contradiction analyses
-- decision notes
-- research questions
-- explainers
+Health-check the wiki periodically.
 
-### 3. Lint
+Checks:
 
-Lint checks the health of the wiki.
-
-Expected checks:
-
-- orphan pages
+- orphan pages (no inbound links)
 - missing backlinks
-- outdated summaries
-- contradicted claims
+- outdated summaries superseded by newer sources
+- contradicted claims not yet flagged
+- important concepts mentioned but lacking their own page
 - pages without citations
-- important concepts without pages
-- duplicate pages
-- weak index entries
+- duplicate or near-duplicate pages
 - stale open questions
-- source pages not reflected in synthesis pages
 
-Lint should produce:
+Output: a health report with suggested fixes.
 
-- a short health report
-- suggested fixes
-- optional direct updates if the user approves
+---
 
 ## Key Files
 
 ### `wiki/index.md`
 
-Purpose:
+Content-oriented catalog of everything in the wiki.
 
-- content-oriented catalog
-- first file the LLM reads before answering most questions
-- helps humans browse the wiki
+Each entry:
 
-Recommended sections:
-
-- overview
-- sources
-- concepts
-- entities
-- syntheses
-- comparisons
-- contradictions
-- open questions
-
-Each entry should include:
-
-- link
+- link to the page
 - one-line summary
 - optional source count
 - optional last-updated date
 
+Organized by category (sources, concepts, entities, syntheses, comparisons, contradictions, open questions).
+
+The LLM reads this first before answering most questions. At moderate scale (~100 sources, ~hundreds of pages), the index alone can replace embedding-based retrieval.
+
 ### `wiki/log.md`
 
-Purpose:
+Chronological, append-only record of operations.
 
-- chronological history of what happened
-- useful for humans and agents resuming work
-
-Recommended entry format:
+Format:
 
 ```markdown
 ## [2026-05-21] ingest | Source Title
 
-- Added: ...
-- Updated: ...
-- Contradictions: ...
+- Added: source-summary, concept-page-X
+- Updated: entity-page-Y, synthesis-Z
+- Contradictions: claim A vs claim B
 - Open questions: ...
 ```
 
-The consistent prefix makes the log searchable with simple tools.
+The consistent prefix format makes the log parseable with simple tools.
 
 ### `wiki/contradictions.md`
 
-Purpose:
+Central tracker for unresolved conflicts between sources.
 
-- central place to track unresolved conflicts
-- prevents contradictions from being hidden in summaries
+Each entry:
 
-Each contradiction should include:
-
-- claim
-- source A
-- source B
-- status
-- current interpretation
+- the contradicted claim
+- source A's position
+- source B's position
+- current status (unresolved / resolved / superseded)
 - what evidence would resolve it
 
 ### `wiki/open-questions.md`
 
-Recommended optional file.
+Questions the wiki cannot yet answer. Serves as a research backlog guiding future source collection.
 
-Purpose:
+---
 
-- capture questions the wiki cannot yet answer
-- guide future source collection
-- make ignorance explicit
+## Folder Structure
 
-This file should become a research backlog.
+```text
+project/
+├── raw/
+│   ├── sources/
+│   └── assets/
+└── wiki/
+    ├── index.md
+    ├── log.md
+    ├── overview.md
+    ├── open-questions.md
+    ├── contradictions.md
+    ├── concepts/
+    ├── entities/
+    ├── sources/
+    ├── syntheses/
+    └── comparisons/
+```
 
-## ALES Mapping
-
-| Wiki LLM concept | ALES concept |
-|---|---|
-| Raw sources | Authoritative source artifacts |
-| Wiki pages | Human-facing generated knowledge product |
-| Source summaries | Derived map/synthesis artifacts |
-| Schema | ALES manifest + tasks + skills |
-| Ingest | Generic task |
-| Query | Generic task |
-| Lint | Generic task |
-| index.md | Human-readable map companion |
-| log.md | Human-readable trace companion |
-| Contradictions | Provenance/staleness/claim conflict artifacts |
-
-## Initial ALES Task Set
-
-Suggested tasks:
-
-- `ingest-source.task`
-- `answer-from-wiki.task`
-- `lint-wiki.task`
-- `refresh-page.task`
-- `file-answer.task`
-
-## Initial ALES Skill Set
-
-Suggested skills:
-
-- `summarize-source.skill`
-- `extract-claims.skill`
-- `update-concept-page.skill`
-- `update-entity-page.skill`
-- `detect-contradictions.skill`
-- `maintain-index.skill`
-- `maintain-log.skill`
-- `cite-sources.skill`
+---
 
 ## Human Role
 
-The human should:
+The human:
 
-- choose sources
-- decide what matters
-- review important synthesis
-- resolve ambiguous interpretations
-- approve major schema changes
-- ask the questions that drive exploration
+- curates and selects sources
+- decides what matters and what to explore
+- reviews important syntheses
+- resolves ambiguous interpretations
+- asks the questions that drive exploration
+- approves major structural changes
 
-The human should not need to:
+The human does not need to:
 
-- manually maintain cross-links
+- maintain cross-links manually
 - remember every contradiction
-- repeatedly summarize old sources
+- re-summarize old sources
 - update every affected page after each ingest
 
 ## LLM Role
 
-The LLM should:
+The LLM:
 
-- ingest sources
-- maintain pages
-- update links
-- flag contradictions
-- file useful answers
-- maintain index and log
-- cite sources
-- ask when evidence is insufficient
+- ingests and processes sources
+- creates and updates all wiki pages
+- maintains cross-references and backlinks
+- flags contradictions
+- files useful query results as new pages
+- maintains index and log
+- cites sources in every claim
+- asks the human when evidence is insufficient
 
-The LLM should not:
+The LLM does not:
 
 - modify raw sources
-- invent claims
+- invent claims without evidence
 - hide uncertainty
 - silently resolve contradictions
-- overwrite human-owned intent without approval
+- overwrite human decisions without approval
 
-## Relationship to Research Studio
+---
 
-Research Studio can be a stricter version of Wiki LLM.
+## Use Cases
 
-Compared to a general personal wiki, Research Studio should add:
+- **Research** — deep-dive on a topic over weeks; papers, articles, reports accumulating into a structured wiki with an evolving thesis
+- **Reading a book** — chapter-by-chapter wiki with characters, themes, plot threads, connections
+- **Personal** — goals, health, self-improvement; journal entries and articles building a structured self-picture
+- **Business** — internal wiki fed by Slack, meetings, customer calls; stays current because the LLM does the maintenance
+- **Competitive analysis** — tracking competitors over time with contradiction detection when claims change
 
-- claim-level provenance
-- confidence levels
-- counter-evidence tracking
-- citation requirements
-- source quality ranking
-- explicit anti-goal: never assert unverified claims
-- bridge to AnimationStudio through `research-spec`
+---
 
-In this framing:
+## Practical Tips
 
-```text
-Wiki LLM = general pattern
-ALES Knowledge Wiki Profile = formalized version
-Research Studio = rigorous research implementation
-```
+- **Obsidian** as the browsing tool (graph view shows wiki shape, orphans, hubs)
+- **Git** for version history and collaboration
+- **Web Clipper** (Obsidian extension) for converting articles to markdown
+- **One source at a time** for engaged ingestion; batch for less critical material
+- **Marp** for generating slide decks from wiki content
+- **Dataview** (Obsidian plugin) for queries over page frontmatter
 
-## Suggested Additional Files
+---
 
-Not all should be created immediately.
+## Scaling Considerations
 
-Recommended later files:
+At small scale (~50 sources): `index.md` is sufficient for navigation.
 
-1. `knowledge-wiki-profile.md`
-   - Formal ALES profile for Wiki LLM-style projects.
+At medium scale (~100–300 sources): consider adding a local search tool (e.g., qmd, or a simple BM25 script).
 
-2. `research-studio-plan.md`
-   - Concrete plan for turning the profile into ALES's research case study.
-
-3. `task-specs.md`
-   - Drafts for `ingest-source`, `answer-from-wiki`, and `lint-wiki`.
-
-4. `schema-questions.md`
-   - Open questions about folder layout, provenance granularity, and filing policy.
-
-For now, the two most important files are this plan and the ALES absorption plan.
-
-## Recommendation
-
-Build Wiki LLM as an ALES-governed knowledge-base profile, not as a separate competing framework.
-
-The first implementation should likely be Research Studio, because research benefits most from:
-
-- source immutability
-- claim provenance
-- contradiction tracking
-- durable synthesis
-- linting
-- traceability
-
-This makes Wiki LLM useful on its own while strengthening ALES's claim that its taxonomy generalizes beyond code.
+At large scale (500+ sources): proper search infrastructure becomes necessary; the index file is no longer enough for the LLM to find relevant pages efficiently.

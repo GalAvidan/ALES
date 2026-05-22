@@ -1,338 +1,170 @@
-# ALES Absorption Plan for Wiki LLM Mechanics
+# ALES Absorption Plan — What to Change in the Spec
 
 ## Purpose
 
-This plan describes how ALES should absorb the useful mechanics from the Wiki LLM idea without collapsing ALES into a personal wiki product.
+This plan defines what ALES needs to add or change to support knowledge-base workflows inspired by Wiki LLM.
 
-The intended outcome is:
+It does not describe Wiki LLM itself (see `wiki-llm-plan.md` for that).
 
-> ALES remains the broader specification for structured, provenance-aware agent context, while Wiki LLM becomes a concrete knowledge-base profile, workflow, and case study inside the ALES ecosystem.
+It focuses on concrete spec-level additions to ALES.
 
-## Positioning
+---
 
-ALES should not merge with Wiki LLM as an equal replacement idea.
+## Decision: What Goes Into Core ALES vs. a Domain Profile
 
-Instead:
+### Absorb into core ALES
 
-- **ALES is the specification layer.**
-- **Wiki LLM is a domain profile / reference workflow.**
-- **Research Studio can use the Wiki LLM profile as its first non-code ALES instance.**
+These concepts are general enough to benefit any ALES domain, not just knowledge bases:
 
-This preserves ALES's core identity:
+1. **Knowledge-product distinction** — ALES should formally distinguish between agent-context artifacts (optimized for task execution) and generated knowledge products (optimized for human reading). Both are governed by provenance, but they serve different audiences.
 
-- bounded context
-- auditable traversal
-- model portability
-- provenance-aware staleness
-- task and skill separation
-- traceable agent execution
+2. **Durable query outputs** — when an agent produces a meaningful synthesis during task execution, ALES should support filing it as a new derived artifact with provenance. This prevents valuable work from disappearing into chat history.
 
-While absorbing Wiki LLM's strongest practical insight:
+3. **Contradiction as a first-class staleness event** — ALES already tracks staleness (source changed → derived artifact may be outdated). Contradiction is the symmetric case: two sources disagree. ALES should add contradiction as a provenance event type alongside staleness.
 
-> LLM-generated knowledge should compound into durable, browsable, interlinked artifacts instead of disappearing into chat history.
+4. **Human-readable index/log as optional companions** — `index.md` as a human companion to `map/`, and `log.md` as a human companion to `traces/`. Optional, not required.
 
-## Useful Mechanics to Absorb
+### Keep in a domain profile (not core)
 
-### 1. Human-browsable generated knowledge
+These are useful for knowledge-base projects but should not be forced on code repos or other domains:
 
-ALES currently emphasizes context that agents consume.
+- Obsidian/git workflow assumptions
+- Fixed wiki folder structure
+- Personal-knowledge-base-only framing
+- Markdown-only output format assumptions
+- Specific page types (concept pages, entity pages, etc.)
 
-Wiki LLM emphasizes knowledge that humans browse.
+---
 
-ALES should explicitly support both:
+## Spec Addition 1: Knowledge-Product Layer
 
-- **Agent-facing context**: structured files optimized for task execution.
-- **Human-facing synthesis**: readable markdown pages, indexes, summaries, and comparisons.
+ALES currently defines what agents consume. It should also define what agents produce as durable outputs.
 
-This matters because non-code ALES instances, especially research, need to be useful even when no agent task is currently running.
+**Proposed concept:**
 
-### 2. Query results as durable artifacts
+A **knowledge product** is an agent-generated artifact that:
 
-Wiki LLM has a strong rule:
+- lives outside `agent-context/` (it is not execution context)
+- is governed by `agent-context/` (tasks and skills control how it is maintained)
+- carries provenance metadata (derived_from, generated_at, fingerprint)
+- is optimized for human consumption
 
-> Good answers should be filed back into the wiki.
-
-ALES should adopt this as a formal workflow option.
-
-When an agent answers a meaningful research or synthesis question, the output should be eligible to become:
-
-- a new synthesis page
-- an updated concept page
-- a comparison artifact
-- an unresolved question
-- a trace-linked decision note
-
-This turns exploratory conversations into accumulated project knowledge.
-
-### 3. Index and log files
-
-Wiki LLM proposes two simple navigation primitives:
-
-- `index.md` — content-oriented catalog
-- `log.md` — chronological activity record
-
-ALES already has richer concepts:
-
-- `ales.manifest.json`
-- `map/`
-- `_provenance.json`
-- `traces/`
-
-But `index.md` and `log.md` are useful because they are simple, human-readable, and friendly to markdown tools like Obsidian.
-
-ALES should add them as optional profile-level artifacts, not core required spec files.
-
-Recommended mapping:
-
-| Wiki LLM file | ALES role |
-|---|---|
-| `index.md` | Human-readable companion to `map/` |
-| `log.md` | Human-readable companion to `traces/` |
-
-### 4. Ingest / query / lint as first-class tasks
-
-Wiki LLM's operations map cleanly into ALES tasks:
-
-| Wiki LLM operation | ALES task |
-|---|---|
-| Ingest | `ingest-source.task` |
-| Query | `answer-from-knowledge-base.task` |
-| Lint | `lint-knowledge-base.task` |
-
-ALES should formalize these as generic task templates for knowledge-base domains.
-
-Project-specific skills can then define how each domain performs them.
-
-For example:
-
-- research paper ingestion
-- book chapter ingestion
-- meeting transcript ingestion
-- competitive analysis ingestion
-- health journal ingestion
-
-### 5. Contradiction and stale-claim handling
-
-Wiki LLM highlights contradictions between sources.
-
-ALES already has the right primitives:
-
-- provenance
-- staleness
-- claim-level citations
-- traces
-- stale refresh passes
-
-ALES should make contradiction handling explicit in the knowledge-base profile:
-
-- new sources may strengthen an existing claim
-- new sources may weaken an existing claim
-- new sources may contradict an existing claim
-- contradictions should become first-class artifacts, not hidden notes
-
-Recommended artifact:
+**Relationship to existing layers:**
 
 ```text
-agent-context/map/contradictions.json
+agent-context/        ← execution contract (existing)
+output/               ← knowledge products (new concept)
 ```
 
-Or, for human-facing knowledge bases:
+The exact folder name (`output/`, `wiki/`, `generated/`) is left to the domain profile. The spec addition is the concept and its provenance rules.
+
+---
+
+## Spec Addition 2: Filing Policy for Task Outputs
+
+ALES tasks currently emit results with a trace. The spec should add an optional `file_output` step in the execution loop:
 
 ```text
-wiki/contradictions.md
+6. EMIT        → return result + trace
+7. FILE        → (optional) persist result as a new derived artifact with provenance
 ```
 
-### 6. Obsidian/git workflow
+**Filing criteria (suggested defaults, overridable per profile):**
 
-Wiki LLM's "Obsidian is the IDE, LLM is the programmer, wiki is the codebase" framing is useful.
+File when the output is:
 
-ALES should use this as a motivating explanation for non-code audiences:
-
-- Markdown files are the source tree.
-- The LLM performs edits.
-- Git gives history and review.
-- Obsidian gives browsing, graph view, and human inspection.
-
-This is not required for ALES, but it is a strong reference implementation pattern.
-
-## Proposed ALES Additions
-
-### 1. Add a Knowledge Wiki profile
-
-Create a documented profile:
-
-```text
-ALES Knowledge Wiki Profile
-```
-
-This profile defines how to instantiate ALES for a living knowledge base.
-
-It should include:
-
-- source folder conventions
-- generated wiki folder conventions
-- required tasks
-- recommended skills
-- provenance expectations
-- index/log conventions
-- contradiction handling
-- when answers should be filed back
-
-### 2. Add generic knowledge-base tasks
-
-Suggested task templates:
-
-- `ingest-source.task`
-- `answer-from-knowledge-base.task`
-- `lint-knowledge-base.task`
-- `refresh-synthesis.task`
-- `file-query-result.task`
-
-These should live at the generic ALES task level, not inside one project.
-
-### 3. Add knowledge-base skills
-
-Suggested skill templates:
-
-- `extract-claims.skill`
-- `update-concept-page.skill`
-- `update-entity-page.skill`
-- `detect-contradictions.skill`
-- `maintain-index.skill`
-- `maintain-log.skill`
-- `cite-source.skill`
-
-These may start as examples in the Wiki LLM profile and later become reusable shared skills.
-
-### 4. Add human-facing generated artifacts
-
-ALES should distinguish between:
-
-- **agent context artifacts** — optimized for task execution
-- **knowledge product artifacts** — optimized for human reading
-
-Suggested folders for a knowledge wiki profile:
-
-```text
-raw/                  # immutable sources
-wiki/                 # LLM-maintained human-readable markdown
-agent-context/        # ALES execution contract
-```
-
-The wiki is not a replacement for `agent-context/`.
-
-The wiki is a generated product governed by `agent-context/`.
-
-### 5. Add a filing policy for query outputs
-
-Not every answer should become a file.
-
-ALES should define a filing policy:
-
-File the answer when it is:
-
-- reusable
 - a synthesis across multiple sources
-- a comparison
-- a decision
-- a contradiction analysis
-- an unresolved research question
-- a stable explanation likely to be referenced later
+- a comparison or analysis
+- a decision or resolution
+- an unresolved question worth tracking
+- reusable beyond the current conversation
 
-Do not file the answer when it is:
+Do not file when the output is:
 
 - purely conversational
-- temporary
 - low-confidence
-- superseded by an existing page
-- not backed by citations
+- already superseded by an existing artifact
+- not backed by traceable sources
 
-## Proposed Folder Shape
+---
 
-For the Wiki LLM profile:
+## Spec Addition 3: Contradiction Events
 
-```text
-knowledge-wiki/
-├── raw/
-│   ├── sources/
-│   └── assets/
-├── wiki/
-│   ├── index.md
-│   ├── log.md
-│   ├── overview.md
-│   ├── concepts/
-│   ├── entities/
-│   ├── sources/
-│   ├── syntheses/
-│   └── contradictions.md
-└── agent-context/
-    ├── ales.manifest.json
-    ├── intent/
-    ├── map/
-    ├── skills/
-    ├── tasks/
-    └── traces/
+ALES provenance currently tracks:
+
+- `stale: true/false`
+- `stale_reason`
+- `derived_from`
+- `fingerprint`
+
+Add a new provenance event type:
+
+```json
+{
+  "type": "contradiction",
+  "claim": "Orders use eventual consistency",
+  "source_a": "intent/architecture.md",
+  "source_b": "raw/sources/new-paper.md",
+  "detected_at": "2026-05-22T09:00:00Z",
+  "status": "unresolved"
+}
 ```
 
-## Relationship to Research Studio
+Contradictions should:
 
-Research Studio should likely be the first serious implementation of this profile.
+- be surfaced during ingest and lint operations
+- be tracked in a dedicated artifact (e.g., `map/contradictions.json`)
+- trigger review, not silent resolution
 
-The relationship should be:
+---
 
-```text
-ALES
-└── Knowledge Wiki Profile
-    └── Research Studio
-```
+## Spec Addition 4: Human-Readable Companions
 
-Research Studio can specialize the generic profile with:
+Two optional files that any ALES project can add:
 
-- stricter citation requirements
-- claim-level provenance
-- confidence levels
-- counter-evidence tracking
-- "never assert unverified claims" anti-goal
-- bridge task into AnimationStudio
+| File | Purpose | Companion to |
+|---|---|---|
+| `index.md` | Content-oriented catalog of all knowledge artifacts | `map/` |
+| `log.md` | Chronological record of agent operations | `traces/` |
 
-## Should This Become Core ALES?
+These are not required by the spec. They are recommended when the project has human readers who browse the knowledge base directly (e.g., in Obsidian, VS Code, or GitHub).
 
-Partially.
+---
 
-Core ALES should absorb:
+## Spec Addition 5: Ingest/Query/Lint Task Family
 
-- durable query outputs
-- human-readable index/log as optional companions
-- ingest/query/lint task family
-- contradiction handling
-- knowledge-product distinction
+ALES should define three generic task templates for knowledge-management domains:
 
-Core ALES should not absorb:
+| Task | Purpose |
+|---|---|
+| `ingest-source.task` | Process a new source into the knowledge base |
+| `query-knowledge-base.task` | Answer a question against accumulated knowledge |
+| `lint-knowledge-base.task` | Check health and consistency of the knowledge base |
 
-- Obsidian as a requirement
-- a fixed wiki folder structure
-- a personal-knowledge-base-only framing
-- markdown-only assumptions for all domains
+These are generic tasks (portable across projects). Domain-specific skills define how each project performs them.
+
+---
+
+## New ALES Concept: Domain Profile
+
+A **domain profile** is a documented set of conventions for applying ALES to a specific domain.
+
+A profile specifies:
+
+- which optional spec features to use
+- folder layout conventions
+- required tasks and skills
+- provenance granularity expectations
+- output artifact types
+
+The first profile should be the **Knowledge Wiki Profile**, which defines how to apply ALES to an LLM-maintained knowledge base.
+
+---
 
 ## Recommended Next Steps
 
-1. Define the Knowledge Wiki profile as an ALES domain profile.
-2. Use Research Studio as the first concrete instance.
-3. Draft `ingest-source`, `answer-from-knowledge-base`, and `lint-knowledge-base` task specs.
-4. Draft minimal skills for claim extraction, contradiction detection, and index maintenance.
-5. Decide whether the generated wiki lives inside `agent-context/` or beside it. Recommended: beside it.
-6. Update the ALES paper plan to include Wiki LLM / Research Studio as a non-code case study.
-
-## Decision Recommendation
-
-ALES should absorb Wiki LLM as:
-
-> A concrete knowledge-base profile and workflow that demonstrates ALES beyond code.
-
-It should not become:
-
-> ALES renamed as Wiki LLM, or ALES reduced to a markdown wiki pattern.
-
-The strongest combined framing is:
-
-> Wiki LLM shows what a living LLM-maintained knowledge base feels like. ALES provides the specification that makes it auditable, stale-aware, task-driven, and portable across agents.
+1. Draft the Knowledge Wiki Profile as a formal ALES domain profile document.
+2. Draft the three generic knowledge-base task specs.
+3. Decide the provenance format for contradiction events.
+4. Update `paper-plan.md` to reference Wiki LLM as a non-code case study.
+5. Use Research Studio as the first concrete implementation of the Knowledge Wiki Profile.
