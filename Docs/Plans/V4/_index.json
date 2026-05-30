@@ -1,0 +1,182 @@
+{
+  "_comment": "Example _index.json for the 'repo' scope of acme-api. Generated and kept fresh by the refresh-map task. Agents load this file (not the full blocks) to discover what exists before deciding what to load fully.",
+
+  "scope": "repo:acme-api",
+  "generated_at": "2026-05-14T10:00:00Z",
+  "repo_sha": "sha256:placeholder-update-at-refresh",
+
+  "blocks": [
+
+    {
+      "id": "intent:overview",
+      "content_type": "knowledge",
+      "path": "agent-context/intent/overview.md",
+      "headline": "acme-api hosts Catalog, Orders, and Payments — Clean Architecture, .NET 9, MediatR.",
+      "tokens": 1100,
+      "tags": ["architecture", "overview", "dotnet"],
+      "stale": false
+    },
+    {
+      "id": "intent:architecture",
+      "content_type": "knowledge",
+      "path": "agent-context/intent/architecture.md",
+      "headline": "Clean Architecture layers: Domain / Application / Infrastructure / API. MediatR for CQRS.",
+      "tokens": 1800,
+      "tags": ["architecture", "patterns", "cqrs", "mediatr"],
+      "stale": false
+    },
+    {
+      "id": "intent:conventions",
+      "content_type": "knowledge",
+      "path": "agent-context/intent/conventions.md",
+      "headline": "Naming, folder layout, error model (ProblemDetails), DTO location rules.",
+      "tokens": 950,
+      "tags": ["conventions", "naming", "dto", "errors"],
+      "stale": false
+    },
+    {
+      "id": "intent:decisions:2026-no-shared-db",
+      "content_type": "knowledge",
+      "path": "agent-context/intent/decisions/2026-no-shared-db.md",
+      "headline": "ADR: Each project owns its own DB schema. No cross-project direct table access.",
+      "tokens": 420,
+      "tags": ["adr", "database", "isolation"],
+      "stale": false
+    },
+
+    {
+      "id": "map:modules",
+      "content_type": "knowledge",
+      "path": "agent-context/map/modules.json",
+      "headline": "Module listing: Catalog, Orders, Payments — paths, owners, entry points.",
+      "tokens": 680,
+      "tags": ["map", "modules", "derived"],
+      "_meta": {
+        "generated_at": "2026-05-14T10:00:00Z",
+        "ttl_days": 7,
+        "derived_from": ["src/Catalog/**", "src/Orders/**", "src/Payments/**"],
+        "fingerprint": "sha256:modules-fingerprint",
+        "stale": false,
+        "stale_reason": null
+      }
+    },
+    {
+      "id": "map:apis",
+      "content_type": "knowledge",
+      "path": "agent-context/map/apis.json",
+      "headline": "API surface summary: 14 endpoints across 3 controllers. Derived from OpenAPI spec.",
+      "tokens": 1200,
+      "tags": ["map", "api", "endpoints", "derived"],
+      "_meta": {
+        "generated_at": "2026-05-14T10:00:00Z",
+        "ttl_days": 7,
+        "derived_from": ["src/**/*Controller.cs"],
+        "fingerprint": "sha256:apis-fingerprint",
+        "stale": false,
+        "stale_reason": null
+      }
+    },
+
+    {
+      "id": "skill:add-endpoint",
+      "content_type": "rule",
+      "path": "agent-context/skills/add-endpoint.skill.md",
+      "headline": "How to add a REST endpoint in acme-api: controller → handler → DTO → tests → OpenAPI verify.",
+      "tokens": 820,
+      "tags": ["skill", "endpoint", "controller", "dotnet"],
+      "connections_summary": {
+        "imports": "ecosystem:ales-shared/add-endpoint@1.2.0",
+        "governed_by": ["enterprise:security-policy#AUTH-001"],
+        "overrides": { "validation_library": "DataAnnotations" }
+      }
+    },
+    {
+      "id": "skill:run-tests",
+      "content_type": "rule",
+      "path": "agent-context/skills/run-tests.skill.md",
+      "headline": "Test commands: dotnet test. Integration tests require LocalDB. Coverage threshold 80%.",
+      "tokens": 340,
+      "tags": ["skill", "testing", "dotnet", "ci"],
+      "connections_summary": {
+        "governed_by": ["enterprise:security-policy#CI-001"]
+      }
+    },
+    {
+      "id": "skill:deploy",
+      "content_type": "rule",
+      "path": "agent-context/skills/deploy.skill.md",
+      "headline": "Deploy via Azure Pipelines to staging first; promote to prod with approval gate.",
+      "tokens": 510,
+      "tags": ["skill", "deploy", "azure", "pipeline"],
+      "connections_summary": {
+        "governed_by": ["enterprise:platform-catalog#DEPLOY-001"],
+        "depends_on": ["workspace:acme-commerce/infra-context"]
+      }
+    },
+
+    {
+      "id": "task:add-feature",
+      "content_type": "task",
+      "path": "agent-context/tasks/add-feature.task.json",
+      "headline": "Add a feature: resolve → plan → load → execute (invoke skill) → verify → emit trace.",
+      "tokens": 460,
+      "tags": ["task", "add-feature"],
+      "connections_summary": {
+        "imports": "ecosystem:ales-shared/add-endpoint@1.2.0"
+      }
+    },
+    {
+      "id": "task:debug-test-failure",
+      "content_type": "task",
+      "path": "agent-context/tasks/debug-test-failure.task.json",
+      "headline": "Debug a failing test: identify failure → load relevant skill/domain → root cause → fix → re-run.",
+      "tokens": 390,
+      "tags": ["task", "debug", "testing"],
+      "connections_summary": {
+        "imports": "ecosystem:ales-shared/debug-test-failure@1.0.3"
+      }
+    },
+    {
+      "id": "task:refresh-map",
+      "content_type": "task",
+      "path": "agent-context/tasks/refresh-map.task.json",
+      "headline": "Refresh derived map/ files. Re-derive modules and APIs; update _index.json.",
+      "tokens": 310,
+      "tags": ["task", "map", "maintenance"],
+      "connections_summary": {
+        "imports": "ecosystem:ales-shared/refresh-map@2.1.0"
+      }
+    },
+
+    {
+      "id": "trace:index",
+      "content_type": "memory",
+      "path": "agent-context/traces/_index.json",
+      "headline": "Trace index: 47 total runs. Most recent: add-feature (2026-05-13), debug-test-failure (2026-05-12).",
+      "tokens": 90,
+      "tags": ["memory", "traces", "index"]
+    }
+
+  ],
+
+  "child_scope_index": [
+    {
+      "scope_id": "project:Catalog",
+      "manifest": "src/Catalog/agent-context/ales.manifest.json",
+      "headline": "Catalog project: product listing, search, category management.",
+      "index_tokens": 520
+    },
+    {
+      "scope_id": "project:Orders",
+      "manifest": "src/Orders/agent-context/ales.manifest.json",
+      "headline": "Orders project: order lifecycle state machine, fulfilment, cancellation.",
+      "index_tokens": 610
+    },
+    {
+      "scope_id": "project:Payments",
+      "manifest": "src/Payments/agent-context/ales.manifest.json",
+      "headline": "Payments project: payment capture, refund, audit trail.",
+      "index_tokens": 580
+    }
+  ]
+}

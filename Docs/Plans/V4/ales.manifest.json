@@ -1,0 +1,121 @@
+{
+  "_comment": "Example ales.manifest.json for the 'repo' scope of acme-api. See planV4.md for the full two-axis model.",
+
+  "ales_version": "4.0.0",
+  "schema_version": "4.0.0",
+
+  "scope": {
+    "type": "repo",
+    "id": "repo:acme-api",
+    "name": "acme-api",
+    "description": "Acme Commerce backend HTTP API — hosts Catalog, Orders, and Payments projects."
+  },
+
+  "repo_sha": "sha256:placeholder-update-at-refresh",
+
+  "parent_scope": {
+    "type": "workspace",
+    "id": "workspace:acme-commerce",
+    "manifest": "https://github.com/acme-corp/acme-commerce-program-context/agent-context/ales.manifest.json",
+    "_comment": "Walk this chain to reach enterprise scope via workspace manifest's own parent_scope."
+  },
+
+  "child_scopes": [
+    {
+      "id": "project:Catalog",
+      "path": "src/Catalog/agent-context/ales.manifest.json"
+    },
+    {
+      "id": "project:Orders",
+      "path": "src/Orders/agent-context/ales.manifest.json"
+    },
+    {
+      "id": "project:Payments",
+      "path": "src/Payments/agent-context/ales.manifest.json"
+    }
+  ],
+
+  "source_of_truth_order": [
+    "tests and runtime behavior",
+    "production code",
+    "ADRs and architecture docs",
+    "README and developer docs",
+    "agent-authored map entries"
+  ],
+
+  "task_registry": [
+    { "id": "add-feature",        "file": "tasks/add-feature.task.json",        "origin": "ecosystem:ales-shared/add-endpoint@1.2.0" },
+    { "id": "debug-test-failure", "file": "tasks/debug-test-failure.task.json", "origin": "ecosystem:ales-shared/debug-test-failure@1.0.3" },
+    { "id": "refresh-map",        "file": "tasks/refresh-map.task.json",        "origin": "ecosystem:ales-shared/refresh-map@2.1.0" }
+  ],
+
+  "import_registry": [
+    {
+      "id": "ecosystem:ales-shared/add-endpoint@1.2.0",
+      "source": "github:ales-shared/dotnet-skills/add-endpoint.skill.md",
+      "version": "1.2.0",
+      "pinned_sha": "sha256:abc123def456"
+    },
+    {
+      "id": "enterprise:acme-corp/security-policy",
+      "source": "https://github.com/acme-corp/platform-context/agent-context/intent/security-policy.md",
+      "version": "pinned",
+      "pinned_sha": "sha256:enterprise-sec-policy-sha"
+    },
+    {
+      "id": "workspace:acme-commerce/shared-contracts",
+      "source": "https://github.com/acme-corp/acme-commerce-program-context/agent-context/intent/shared-contracts.md",
+      "version": "pinned",
+      "pinned_sha": "sha256:workspace-contracts-sha"
+    }
+  ],
+
+  "context_budget": {
+    "total_tokens": 120000,
+    "per_scope": {
+      "enterprise": { "max": 4000,  "default_tier": "summary" },
+      "workspace":  { "max": 6000,  "default_tier": "summary" },
+      "repo":       { "max": 25000, "default_tier": "summary" },
+      "project":    { "max": 40000, "default_tier": "full" },
+      "memory":     { "max": 8000,  "default_tier": "summary" }
+    },
+    "reserve_for_response": 30000
+  },
+
+  "writable_paths": [
+    "src/**",
+    "tests/**",
+    "agent-context/traces/**",
+    "agent-context/map/**",
+    "agent-context/intent/_pending/**",
+    "agent-context/skills/_pending/**"
+  ],
+
+  "forbidden_paths": [
+    "agent-context/intent/*.md",
+    "agent-context/skills/*.skill.md",
+    "agent-context/tasks/*.task.json",
+    "agent-context/ales.manifest.json"
+  ],
+
+  "trace_retention_days": 90,
+
+  "trace_redact_patterns": [
+    "**/.env*",
+    "**/secrets/**",
+    "**/credentials/**"
+  ],
+
+  "security": {
+    "codeowners_required_for": ["tasks/", "skills/", "intent/"],
+    "cross_repo_imports_must_be_pinned": true,
+    "pending_not_loadable_mid_task": true,
+    "validate_on_commit": ["ales validate", "ales check-claims"]
+  },
+
+  "staleness_defaults": {
+    "map_ttl_days": 7,
+    "intent_ttl_days": 90,
+    "trace_informed_calibration": true
+  }
+}
