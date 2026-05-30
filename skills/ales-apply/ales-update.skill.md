@@ -38,6 +38,7 @@ Build a diff covering:
 | Missing dependencies folder | Any cross-repo aliases in intent files not yet in `intent/dependencies/` |
 | Missing `templates/` folder | Present in canonical but absent here |
 | Stale map content | Map files whose source folders have been added, renamed, or deleted |
+| Plugin manifests present | Detect `plugins/*/manifest.md`; list each integration and version found |
 
 ### Step 3 — CONFIRM
 
@@ -65,6 +66,15 @@ Wait for explicit confirmation.
 
 Create any missing folders and files using templates from `reference/file-templates.md`.
 **Never overwrite existing files.** This step is strictly additive.
+
+**Plugin preservation rule:** If `plugins/` exists, never modify, delete, or overwrite any file under `plugins/*/`. Preserve the entire subtree unchanged. Only report plugin manifests found.
+
+**Plugin install flow (Option B — folded into update):** If a user requests installing a new plugin manifest (e.g., "install hub plugin manifest for X studio"), perform the following *only* after explicit approval:
+1. Create `plugins/<integration-id>/` folder if absent.
+2. Create `plugins/<integration-id>/manifest.md` using the template in `reference/file-templates.md`.
+3. Fill in all required fields from user-provided values.
+4. Add the new manifest to the diff report under "Added".
+5. Never overwrite an existing manifest without explicit overwrite approval.
 
 If `intent/vault.md` or any flat cross-repo alias file is found directly in `intent/`:
 - Create `intent/dependencies/` folder.
@@ -113,6 +123,7 @@ Review recommended:
 - All folders in the canonical structure exist under `agent-context/`.
 - `agent-context/tasks/refresh-map.task.md` is present.
 - If cross-repo aliases existed in `intent/`, they now live under `intent/dependencies/`.
+- All existing `plugins/*/manifest.md` files are unchanged (verify by diff).
 
 ## Ask When
 - A map file is stale but the current folder structure is ambiguous — ask before updating.

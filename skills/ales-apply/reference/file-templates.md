@@ -221,3 +221,42 @@ All `map/*.md` files accurately describe the current project structure and workf
 - A folder's purpose is ambiguous — stop and ask the human before writing.
 - A task file referenced in `workflow.md` no longer exists — stop and report.
 ```
+
+---
+
+## plugins/\<integration-id\>/manifest.md
+
+```yaml
+---
+plugin_id: <integration-id>
+manifest_version: 1.0.0
+studio_id: <kebab-case-studio-id>
+studio_name: <Display Name>
+project_root_alias: <alias-token>
+status:
+  source_path: <path-or-alias>
+  read_mode: file
+current_work:
+  source_path: <path-or-alias>
+  read_mode: directory-index
+blockers:
+  source_path: <path-or-alias>
+  read_mode: file
+recent_activity:
+  source_path: <path-or-alias>
+  read_mode: directory-index
+bounds:
+  max_files_per_query: 20
+  max_lines_per_file: 200
+  max_depth: 3
+security:
+  allow_paths:
+    - <allowed-path-prefix>
+  deny_paths:
+    - agent-context/intent/dependencies/
+    - .git/
+confidence_rules:
+  status_confidence: medium
+notes: <optional free text>
+---
+```

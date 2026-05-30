@@ -44,6 +44,8 @@ For each ALES-enabled repo, check the following against the canonical structure 
 | `map/workflow.md` | Present | PRESENT / MISSING |
 | `tasks/refresh-map.task.md` | Present | PRESENT / MISSING |
 | `templates/` folder | Present | PRESENT / MISSING |
+| `plugins/` folder | Optional | PRESENT / ABSENT |
+| `plugins/hub/manifest.md` | Present if Hub-connected | PRESENT / MISSING |
 
 Also check for legacy patterns that should be migrated:
 - `intent/vault.md` (flat file) → should be `intent/dependencies/vault.md`
@@ -66,6 +68,16 @@ Verify that a hub agent could navigate all repos without scanning:
 | Understand repo connections | `intent/dependencies/_index.md` | ✓/✗ per repo |
 | Navigate repo structure | `map/folders.md` | ✓/✗ per repo |
 | Know how to work in repo | `map/workflow.md` | ✓/✗ per repo |
+| Expose Hub plugin manifest | `plugins/hub/manifest.md` | ✓/✗ per repo |
+
+For each repo that has `plugins/hub/manifest.md`, run the Hub manifest validation checklist:
+1. All required keys exist (`plugin_id`, `manifest_version`, `studio_id`, `studio_name`, `project_root_alias`, `status`, `current_work`, `blockers`, `recent_activity`, `bounds`, `security`).
+2. All declared `source_path` values resolve under the repo root or a known alias.
+3. `bounds` values are present and positive.
+4. `security.allow_paths` and `security.deny_paths` are non-empty.
+5. At least one of `status`, `current_work`, `blockers`, `recent_activity` source paths is readable.
+
+Report each check as PASS / FAIL with a short reason.
 
 ### Step 5 — REPORT
 
