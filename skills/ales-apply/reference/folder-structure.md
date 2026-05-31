@@ -49,8 +49,12 @@
 │   ├── refresh-map.task.md         ← always present; keeps map/ current
 │   └── *.task.md
 │
-└── templates/                      ← starter files for humans and agents
-    └── *.template.md
+├── templates/                      ← starter files for humans and agents
+│   └── *.template.md
+│
+└── plugins/                        ← optional; declared by third-party integrations
+    └── <integration-id>/
+        └── manifest.md             ← plugin manifest (contract between this repo and the integrator)
 ```
 
 ---
@@ -64,6 +68,7 @@
 | `skills/` | *How do you do X specifically in this project?* | Human (agent may suggest) | Only when intent or conventions change |
 | `tasks/` | *How does an agent execute a class of work?* | Spec / portable | Spec-versioned; reusable across repos |
 | `templates/` | *What is the starter shape of this artifact?* | Human | When artifact format changes |
+| `plugins/` | *What contract does this repo expose to integrators?* | Integration owner | When integration contract changes |
 
 **Key distinction — skills vs tasks:**
 A *task* is a generic, portable procedure (e.g., "refresh the map", "create a project").
@@ -257,3 +262,21 @@ What a successful execution produces.
 Starter file skeletons. Filled in by humans or agents when creating a new artifact.
 Filename: `<artifact-type>.template.md`.
 Contents: the artifact structure with `<placeholder>` fields and inline guidance comments.
+
+---
+
+### plugins/\<integration-id\>/manifest.md
+
+Optional. Present only when this repo participates in a third-party integration (e.g. a Hub agent).
+One folder per integration. The `manifest.md` is the sole contract file.
+
+Required fields for Hub integrations (`plugin_id: hub`):
+- `plugin_id`, `manifest_version`, `studio_id`, `studio_name`, `project_root_alias`
+- `status`, `current_work`, `blockers`, `recent_activity` — each with `source_path` and `read_mode`
+- `bounds` — `max_files_per_query`, `max_lines_per_file`, `max_depth`
+- `security` — `allow_paths` and `deny_paths` lists
+
+**Rules:**
+- Agents must never create or overwrite `plugins/*/manifest.md` without explicit integration-owner approval.
+- Agents running `ales-update` must preserve the entire `plugins/` tree unchanged.
+- `ales-audit` must detect and report plugin manifests as part of hub-readiness checks.
