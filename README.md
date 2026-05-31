@@ -100,6 +100,18 @@ The four-layer taxonomy is domain-agnostic. Any project where a human has tacit 
 
 ---
 
+## Ideation Standard
+
+Early concepts should be captured in `Vault/agent-context/.ideas/` as structured idea files.
+
+- `.ideas/` is the canonical pre-plan workspace.
+- Promote ideas to `Vault/agent-context/.plans/` only when they are implementation-ready.
+- `ALES/thoughts/` remains archive-only for historical notes.
+
+See `skills/ales-ideas/SKILL.md` for the create/update/promote workflow.
+
+---
+
 ## How an Agent Executes a Task
 
 ```
