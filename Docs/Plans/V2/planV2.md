@@ -310,7 +310,7 @@ The four-layer taxonomy applies across any domain where a human has tacit knowle
 | `skills/` | How to add a feature *here* | Brand palette, citation style | Easing curves, naming conventions |
 | `tasks/` | debug, add-feature, refresh | add-slide, update-data-source | add-scene, sync-audio, export |
 
-**V2 scope boundary:** The POC validates the taxonomy for software repositories. The generalization claim belongs in the paper as a hypothesis, supported by the AnimationStudio workspace as a secondary illustrative example. It is not a production promise.
+**V2 scope boundary:** The POC validates the taxonomy for software repositories. The generalization claim belongs in the paper as a hypothesis, supported by a real-world ALES implementation as a secondary illustrative example. It is not a production promise.
 
 ---
 
