@@ -270,7 +270,7 @@ The paper needs something measurable. This is the minimum viable evaluation for 
 - One or two representative tasks (e.g., "add a small endpoint", "debug a failing test").
 - Three conditions:
   1. No ALES context (agent has only the raw repo).
-  2. Single instruction file (e.g., `AGENTS.md` or `copilot-instructions.md`).
+  2. Single instruction file (e.g., `agents.md` or `copilot-instructions.md`).
   3. ALES structured context (task + skill + bounded map + trace).
 
 **Measurements:**
@@ -290,7 +290,7 @@ The paper needs something measurable. This is the minimum viable evaluation for 
 | Approach | Bounded context | Provenance | Task portability | Human intent layer | Freshness model |
 |---|---|---|---|---|---|
 | No context | ✗ | ✗ | ✗ | ✗ | ✗ |
-| AGENTS.md / CLAUDE.md | Partial | ✗ | ✗ | Partial | ✗ |
+| agents.md / CLAUDE.md | Partial | ✗ | ✗ | Partial | ✗ |
 | RAG only | Partial | Partial | ✗ | ✗ | Partial |
 | ADRs only | ✗ | ✗ | ✗ | Partial | ✗ |
 | ALES | ✓ | ✓ | ✓ | ✓ | ✓ |

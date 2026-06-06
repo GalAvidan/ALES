@@ -23,11 +23,11 @@ Scan the project root. Collect:
 
 | What to look for | Used for |
 |---|---|
-| `README.md`, `README.*` | Project description and purpose |
+| `readme.md`, `README.*` | Project description and purpose |
 | `package.json`, `pyproject.toml`, `*.csproj`, `go.mod`, `Cargo.toml` | Primary language and stack |
 | `src/`, `lib/`, `app/`, `packages/`, `projects/` | Module layout |
 | `.eslintrc*`, `.prettierrc*`, `ruff.toml`, `tsconfig.json` | Conventions source |
-| `AGENTS.md`, `BOT.md`, `CLAUDE.md`, `CONTEXT.md` | Existing agent adapter files |
+| `agents.md`, `BOT.md`, `CLAUDE.md`, `context.md` | Existing agent adapter files |
 | Other repos referenced or aliased in config files | Dependencies |
 
 Record inferred values: `project_name`, `primary_language`, `framework`, `module_roots[]`, `has_vault_dependency`, `has_other_dependencies`.
@@ -68,7 +68,7 @@ agent-context/
 Create `intent/` files using templates from `reference/file-templates.md`:
 
 - `intent/overview.md` — derive purpose and workflow from README and source structure; confirm core workflow with user if unclear
-- `intent/conventions.md` — derive from linting configs, existing naming patterns, and any AGENTS.md or CONTEXT.md files
+- `intent/conventions.md` — derive from linting configs, existing naming patterns, and any agents.md or context.md files
 - `intent/anti-goals.md` — derive from README scope sections or ask user for 2–3 non-goals
 - `intent/glossary.md` — derive domain terms from README, task files, and source identifiers
 
