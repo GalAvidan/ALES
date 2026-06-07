@@ -65,6 +65,11 @@ ALES organizes project knowledge into four layers, each answering a different qu
     └── *.task.json
 ```
 
+> **Implementation note:** Active studios use Markdown files (`*.task.md`, `*.skill.md`,
+> `folders.md`, `workflow.md`) rather than the JSON artifacts shown above.
+> The four-layer taxonomy (intent / map / skills / tasks) is the canonical contract;
+> the file format is Markdown. `ales.manifest.json` and `*.task.json` are not currently required.
+
 ---
 
 ## Provenance — The Defining Property
