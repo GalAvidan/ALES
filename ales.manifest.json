@@ -1,0 +1,128 @@
+{
+  "_schema": "ales-manifest/v1.0.0",
+  "_updated": "2026-06-14",
+  "_purpose": "Repo-wide ALES registry: studio discovery, source-of-truth order, shared guidance, and token-governance hooks.",
+
+  "ales_version": "V2",
+
+  "source_of_truth_order": [
+    "agent-context/intent/  (canonical rules — authoritative, slow-changing)",
+    "agent-context/map/     (derived — verify freshness before use)",
+    "agent-context/skills/  (executable knowledge)",
+    "agent-context/tasks/   (task definitions)",
+    "AGENTS.md              (adapter entrypoint — always read first)"
+  ],
+
+  "studios": [
+    {
+      "id": "animation-studio",
+      "path": "Studios/AnimationStudio",
+      "agents_md": "Studios/AnimationStudio/AGENTS.md",
+      "hub_manifest": "Studios/AnimationStudio/agent-context/plugins/hub/manifest.md",
+      "context_profiles": "Studios/AnimationStudio/agent-context/intent/context-profiles.md",
+      "load_order": "Studios/AnimationStudio/agent-context/map/load-order.md",
+      "skills_index": "Studios/AnimationStudio/agent-context/map/skills-index.md",
+      "tasks_index": "Studios/AnimationStudio/agent-context/map/tasks-index.md",
+      "model_routing": "Studios/AnimationStudio/.github/copilot-instructions.md",
+      "status": "active"
+    },
+    {
+      "id": "curriculum-studio",
+      "path": "Studios/CurriculumStudio",
+      "agents_md": "Studios/CurriculumStudio/AGENTS.md",
+      "hub_manifest": "Studios/CurriculumStudio/agent-context/plugins/hub/manifest.md",
+      "context_profiles": "Studios/CurriculumStudio/agent-context/intent/context-profiles.md",
+      "load_order": "Studios/CurriculumStudio/agent-context/map/load-order.md",
+      "skills_index": "Studios/CurriculumStudio/agent-context/map/skills-index.md",
+      "tasks_index": "Studios/CurriculumStudio/agent-context/map/tasks-index.md",
+      "model_routing": "Studios/CurriculumStudio/.github/copilot-instructions.md",
+      "status": "active"
+    },
+    {
+      "id": "research-studio",
+      "path": "Studios/ResearchStudio",
+      "agents_md": "Studios/ResearchStudio/AGENTS.md",
+      "hub_manifest": "Studios/ResearchStudio/agent-context/plugins/hub/manifest.md",
+      "context_profiles": "Studios/ResearchStudio/agent-context/intent/context-profiles.md",
+      "load_order": "Studios/ResearchStudio/agent-context/map/load-order.md",
+      "skills_index": "Studios/ResearchStudio/agent-context/map/skills-index.md",
+      "tasks_index": "Studios/ResearchStudio/agent-context/map/tasks-index.md",
+      "model_routing": "Studios/ResearchStudio/.github/copilot-instructions.md",
+      "status": "active"
+    },
+    {
+      "id": "studio-hub",
+      "path": "Studios/Studio_Hub",
+      "agents_md": "Studios/Studio_Hub/AGENTS.md",
+      "hub_manifest": "Studios/Studio_Hub/agent-context/plugins/hub/manifest.md",
+      "context_profiles": "Studios/Studio_Hub/agent-context/intent/context-profiles.md",
+      "load_order": "Studios/Studio_Hub/agent-context/map/load-order.md",
+      "skills_index": "Studios/Studio_Hub/agent-context/map/skills-index.md",
+      "tasks_index": "Studios/Studio_Hub/agent-context/map/tasks-index.md",
+      "model_routing": "Studios/Studio_Hub/.github/copilot-instructions.md",
+      "status": "active"
+    },
+    {
+      "id": "studio-browser",
+      "path": "Studios/StudioBrowser",
+      "agents_md": "Studios/StudioBrowser/AGENTS.md",
+      "hub_manifest": null,
+      "context_profiles": null,
+      "load_order": null,
+      "skills_index": null,
+      "tasks_index": null,
+      "model_routing": null,
+      "status": "scaffolding-only"
+    },
+    {
+      "id": "vault",
+      "path": "Vault",
+      "agents_md": "Vault/AGENTS.md",
+      "hub_manifest": null,
+      "context_profiles": null,
+      "load_order": null,
+      "skills_index": null,
+      "tasks_index": null,
+      "model_routing": null,
+      "status": "content-store"
+    }
+  ],
+
+  "shared_guidance": {
+    "token_efficiency_playbook": "ALES/token-efficiency-playbook.md",
+    "context_management_research": "Vault/studios/ResearchStudio/projects/007-agent-context-management/output/report.md",
+    "stale_context_skill": "ALES/skills/reference/verify-context-freshness.skill.md",
+    "cost_control_doctrine": "Vault/Knowledge/concepts/kc-cost-control-requires-budgeting-prompt-and-output.md",
+    "rtk_instructions": "copilot-instructions.md (workspace root)"
+  },
+
+  "token_governance": {
+    "policy": "Load only what the current task names. Escalate minimal → task → full only on a confirmed gap.",
+    "rtk_required": true,
+    "context_profiles_file": "agent-context/intent/context-profiles.md (per studio)",
+    "load_order_file": "agent-context/map/load-order.md (per studio)",
+    "manifests_enforce_bounds": true,
+    "default_profile": "minimal"
+  },
+
+  "staleness_governance": {
+    "model": "TTL + fingerprint (ALES V2)",
+    "ttl_field": "_meta.ttl_days",
+    "derived_from_field": "_meta.derived_from",
+    "verification_skill": "ALES/skills/reference/verify-context-freshness.skill.md",
+    "high_value_targets": [
+      "agent-context/map/workflow.md",
+      "agent-context/map/folders.md",
+      "agent-context/map/skills-index.md",
+      "agent-context/map/tasks-index.md",
+      "wiki/index.md (ResearchStudio projects)",
+      "wiki/synthesis.md (ResearchStudio projects)"
+    ]
+  },
+
+  "future_hooks": {
+    "traces_layer": "Not yet implemented. Planned: agent-context/traces/{task_id}/{run_id}.trace.json (ALES V3)",
+    "adaptive_prioritization": "Not yet implemented. Requires trace collection (ALES V3).",
+    "runtime_token_accounting": "Not yet implemented. Budgets are declared but not measured (ALES V3)."
+  }
+}
